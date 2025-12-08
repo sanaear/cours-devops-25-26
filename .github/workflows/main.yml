@@ -1,0 +1,73 @@
+name: Pipeline CI/CD
+
+# Déclenche le workflow lors d'un push ou d'une pull request vers la branche main
+on:
+  push:
+    branches: [ "main" ]
+    paths: ["lesson3_IntegrationContinue/exemple1_helloapp_ci/**"]
+  pull_request:
+    branches: [ "main" ]
+    paths: ["lesson3_IntegrationContinue/exemple1_helloapp_ci/**"]
+
+jobs:
+  # TÂCHE 1 : VÉRIFICATION DE LA QUALITÉ DU CODE et LANCER TESTS UNITAIRES
+  quality-check:
+    name: Lint et Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/
+
+    steps:
+      - name: Récupération du code (Checkout)
+        uses: actions/checkout@v6
+
+      - name: Configuration de Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.19.6' # Utilise Node v20 (LTS)
+          cache: 'npm'
+          cach-dependency-path: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/package-lock.json
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      # Vérifie les erreurs de style de code (si "lint" est dans le script de package.json)
+      - name: Exécution du Linter
+        run: npm run lint --if-present
+
+      # Exécute les tests unitaires (si "test" est dans le script de package.json)
+      - name: Exécution des tests
+        run: npm test --if-present
+
+
+  # TÂCHE 2 : CONSTRUCTION (BUILD) ET PUSH DE L'IMAGE DOCKER
+  build-and-push:
+    name: Build et Push de l'image Docker
+    needs: quality-check # Ce job attend la réussite de quality-check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' # Pousse l'image uniquement lors des merges réels, pas sur les PRs
+    
+    steps:
+      - name: Récupération du code (Checkout)
+        uses: actions/checkout@v6
+
+      - name: Connexion au Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Configuration de Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build et push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/myhello_app:${{ github.sha }}
+
+
