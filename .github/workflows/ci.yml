@@ -1,4 +1,4 @@
-name: Pipeline CI/CD
+name: Pipeline-2 CI/CD
 
 # Déclenche le workflow lors d'un push ou d'une pull request vers la branche main
 on:
@@ -9,10 +9,14 @@ on:
     branches: [ "main" ]
     paths: ["lesson3_IntegrationContinue/exemple1_helloapp_ci/**"]
 
+
+
 jobs:
+
+
   # TÂCHE 1 : VÉRIFICATION DE LA QUALITÉ DU CODE et LANCER TESTS UNITAIRES
   quality-check:
-    name: Lint et Test
+    name: Lint et Test Unitaire
     runs-on: ubuntu-latest
 
     defaults:
@@ -28,7 +32,7 @@ jobs:
         with:
           node-version: '20.19.6' # Utilise Node v20 (LTS)
           cache: 'npm'
-          cache-dependency-path: lesson3_IntegrationContinue/exemple1_helloapp_ci/package-lock.json
+          cache-dependency-path: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/package-lock.json
 
       - name: Installation des dépendances
         run: npm ci
@@ -48,19 +52,16 @@ jobs:
     needs: quality-check # Ce job attend la réussite de quality-check
     runs-on: ubuntu-latest
     if: github.event_name == 'push' # Pousse l'image uniquement lors des merges réels, pas sur les PRs
-    permissions:
-      packages: write
     
     steps:
       - name: Récupération du code (Checkout)
         uses: actions/checkout@v6
 
-      - name: Connexion au GHCR
+      - name: Connexion au Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Configuration de Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,8 +70,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/
-          file: ./lesson3_IntegrationContinue/exemple1_helloapp_ci//Dockerfile
+          file: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/myhello_app:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/myhello_app:${{ github.sha }}
+
 
 
