@@ -70,6 +70,6 @@ jobs:
           context: ./lesson3_IntegrationContinue/exemple1_helloapp_ci/
           file: ./lesson3_IntegrationContinue/exemple1_helloapp_ci//Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/myapp2:${{ github.sha }}
+          tags: ghcr.io/${{ github.actor }}/myhello_app:${{ github.sha }}
 
 
