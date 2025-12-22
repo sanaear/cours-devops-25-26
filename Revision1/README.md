@@ -22,7 +22,7 @@ Il existe d'autres sites similaires, contenant plusieurs modèles de site en HTM
 - [https://website-templates.github.io](https://website-templates.github.io)
 
 ## B. Initier git et sauvegarder
-1. Créer et remplir un fichier `.gitattributes`
+1. Créer et remplir un fichier `.gitattributes` (ou copier [ce fichier](https://github.com/hibanajjar998/articlesapp_ctrl1/blob/main/.gitattributes))
 2. Ouvrir git à l'intérieur du dossier créé,
 2. Initier git, Ajouter tous les documents, Sauvegarder (commit).
 
