@@ -173,7 +173,7 @@ git pull origin main
 ```
 
 ## I. Écrire le workflow GitHub
-1. créer un fichier `.github/workflows/ci_test_build.yml`
+1. créer un fichier `.github/workflows/ci_test_build.yml` (ou le copier: [ci_test_build.yml](https://github.com/hibanajjar998/html_multiverse_app/blob/main/.github/workflows/ci_test_build.yml))
 2. y créer un job pour les tests, 
 3. y ajouter un job qui dépend du premier, et qui construit l'image et la pousse au GHCR
 4. déclencher le job, débugger
