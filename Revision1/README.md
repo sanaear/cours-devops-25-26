@@ -96,15 +96,16 @@ CMD ["python", "-m", "http.server", "8000"]
 ## E. Créer localement une branche des tests
 
 1. Créer et basculer vers une branche `tests`
-2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires ([voir branch tests](https://github.com/hibanajjar998/html_multiverse_app/tree/tests))
+2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires
+3. ajouter le fichier de configuration (pour installation des packages) `./package.json`
 
 ### Tests de Qualité de Code, de Syntaxe (Linting)
-- **HTMLHint** : vérifie les balises HTML sont bien fermées et respectent les standards.
-- **Stylelint** : pour les dossiers sass et css (feuilles de style).
-- **ESLint** : pour les fichiers dans le dossier js (JavaScript).
+- **HTMLHint** : vérifie les balises HTML sont bien fermées et respectent les standards -> `./.htmlhintrc`
+- **Stylelint** : pour les dossiers sass et css (feuilles de style) -> `./.stylelintrc.json`
+- **ESLint** : pour les fichiers dans le dossier js (JavaScript) -> `./eslint.config.js`
 
 ### Tests Unitaires
-- **Jest** : teste une fonction isolée dans assets/js.
+- **Jest** : teste une fonction isolée dans assets/js  -> `./jest.setup.js` et `./tests/main.test.js`
 
 ## F. Lancer les tests avant de créer l'image Docker
 1. créer un nouveau fichier `Dockerfile_tests` pour d'abord y lancer les tests avant de construire l'image
@@ -173,7 +174,7 @@ git pull origin main
 ```
 
 ## I. Écrire le workflow GitHub
-1. créer un fichier `.github/workflows/ci_test_build.yml` (ou le copier: [ci_test_build.yml](https://github.com/hibanajjar998/html_multiverse_app/blob/main/.github/workflows/ci_test_build.yml))
+1. créer un fichier `.github/workflows/ci_test_build.yml` 
 2. y créer un job pour les tests, 
 3. y ajouter un job qui dépend du premier, et qui construit l'image et la pousse au GHCR
 4. déclencher le job, débugger
