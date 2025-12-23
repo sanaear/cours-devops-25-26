@@ -179,6 +179,70 @@ git pull origin main
 3. y ajouter un job qui dépend du premier, et qui construit l'image et la pousse au GHCR
 4. déclencher le job, débugger
 
+```yaml
+name: CI-Test-Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+  # Job 1 : TESTS
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Quality Tests (Lint)
+        run: |
+          npm run lint:html
+          npm run lint:jsfix
+
+      - name: Run Unit/Integration Tests (Jest)
+        run: npm test
+
+  # Job 2:  DOCKER BUILD & PUSH
+  build-and-push:
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to the GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.actor }}/mvtest_app:${{ github.sha }}
+```
 
 ## J. Déployer localement un docker swarm
  1. Créer un fichier `docker-compose.yml` contenant un seul service, et y configurer le déploiement
