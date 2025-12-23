@@ -96,7 +96,7 @@ CMD ["python", "-m", "http.server", "8000"]
 ## E. Créer localement une branche des tests
 
 1. Créer et basculer vers une branche `tests`
-2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires
+2. Ajouter les fichiers nécessaires de tests de qualité de code et tests unitaires ([lien téléchargement](https://drive.google.com/file/d/1aoq4ncueOZ2pmXpXHb45mRwA_qen-bzV/view?usp=sharing))
 3. ajouter le fichier de configuration (pour installation des packages) `./package.json`
 
 ### Tests de Qualité de Code, de Syntaxe (Linting)
