@@ -268,7 +268,7 @@ services:
       resources:
         limits:
           cpus: '0.2'  # 20% d'un seul coeur CPU
-          memory: 64Mo  # quand dépassé, OOM Kill
+          memory: 64M  # quand dépassé, OOM Kill
 ```
 
 
@@ -279,7 +279,7 @@ docker stack deploy -c docker-compose.yml multiverse_swarm
 
 ### visualiser --------------------
 docker stack ls	#Liste les applications déployées.
-docker service ls	#Affiche l'état des services (vérifie si les 2 replicas sont prêts).
+docker service ls	#Affiche l'état des services (vérifie si les 3 replicas sont prêts).
 docker service ps multiverse_swarm_web	# Montre sur quel "nœud" tourne chaque replica.
 docker stats  # Affiche l'utilisation des resources en temps réel
 
