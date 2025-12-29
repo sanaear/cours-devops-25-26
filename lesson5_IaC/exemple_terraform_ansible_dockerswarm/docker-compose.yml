@@ -1,0 +1,27 @@
+
+services:
+  multiverse-app:
+    #  nom de l'image déjà poussée sur Docker Hub ou GHCR ou ECR
+    image: hibanaj/multiverse:v1
+    
+    ports:
+      - "80:80"
+    
+    deploy:
+      replicas: 3  
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          cpus: '0.2' 
+          memory: 64M
+    
+    networks:
+      - web-net
+
+networks:
+  web-net:
+    driver: overlay # Indispensable pour que les conteneurs communiquent entre les noeuds
