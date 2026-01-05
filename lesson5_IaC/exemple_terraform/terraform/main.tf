@@ -18,11 +18,32 @@ resource "aws_subnet" "public" {
   tags = { Name = "${var.project_name}-public-subnet" } 
 }
 
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.main.id 
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id 
+  }
+
+  tags = { Name = "${var.project_name}-public-rt" }
+}
+
+resource "aws_route_table_association" "public_assoc" {
+  subnet_id      = aws_subnet.public.id 
+  route_table_id = aws_route_table.public_rt.id
+}
+
 # --- SÉCURITÉ ---
+data "http" "my_ip" {
+  url = "https://checkip.amazonaws.com"
+}
+
 resource "aws_security_group" "web_sg" {
   name   = "web-sg"
   vpc_id = aws_vpc.main.id
 
+  # autoriser le trafic entrant sur le port 80 (HTTP) depuis n'importe où sur Internet
   ingress {
     from_port   = 80
     to_port     = 80
@@ -30,6 +51,15 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"] # Ouvre le port HTTP au monde
   }
 
+  # autoriser le trafic entrant sur le port 22 (SSH) uniquement pour l'adresse IP de l'utilisateur
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${chomp(data.http.my_ip.response_body)}/32"] 
+  }
+
+  # autoriser tout le trafic sortant de l'instance vers n'importe quelle destination (permet de télécharger des paquets)
   egress {
     from_port   = 0
     to_port     = 0

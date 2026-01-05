@@ -18,9 +18,27 @@ resource "aws_subnet" "public" {
   tags = { Name = "${var.project_name}-public-subnet" } 
 }
 
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.main.id 
 
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id 
+  }
+
+  tags = { Name = "${var.project_name}-public-rt" }
+}
+
+resource "aws_route_table_association" "public_assoc" {
+  subnet_id      = aws_subnet.public.id 
+  route_table_id = aws_route_table.public_rt.id
+}
 
 # --- SÉCURITÉ ---
+data "http" "my_ip" {
+  url = "https://checkip.amazonaws.com"
+}
+
 resource "aws_security_group" "web_sg" {
   name   = "web-sg"
   vpc_id = aws_vpc.main.id
@@ -32,6 +50,22 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"] # Ouvre le port HTTP au monde
   }
 
+  # autoriser le trafic entrant sur le port 22 (SSH) uniquement pour l'adresse IP de l'utilisateur, pour Ansible
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${chomp(data.http.my_ip.response_body)}/32"] 
+  }
+
+  # Ports Docker Swarm (entre les membres du groupe: self=true)
+  ingress {
+    from_port = 0
+    to_port   = 65535
+    protocol  = "tcp"
+    self      = true 
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -39,17 +73,6 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# Autorisation supplémentaire pour Swarm entre les noeuds
-resource "aws_security_group_rule" "swarm_internal" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "tcp"
-  self              = true # Les noeuds se parlent entre eux
-  security_group_id = aws_security_group.web_sg.id
-}
-
 
 
 # --- SERVEUR ---
