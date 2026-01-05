@@ -17,6 +17,7 @@
 ---
 - **Pitch des projets, Durant la séance du 5 janvier pour le grp B, et le - janvier pour le grp A**
     - 10min présentation + 5 min questions
+    - **noté et inclu dans le contrôle 2, tous les membres de l'équipes seront interrogés à propos de la présentation et du projet**
 	- Le pitch doit présenter votre projet les éléments suivant:
         -problématique adressée et solution proposée
         - la feuille de route, 
